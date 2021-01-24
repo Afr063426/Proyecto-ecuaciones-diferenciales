@@ -67,12 +67,11 @@ fitted_cumulative_incidence<-fitted_cumulative_incidence%>%
   mutate(
     Date=ymd(sir_start_date)+days(t-1),
     Country="Costa Rica",
-    cumulative_incident_cases=2
+    cumulative_incident_cases=datosp$Acumulados
     
   )
 
-fitted_cumulative_incidence%>%ggplot(aes(x=Date))+geom_line(aes(y=I),color="red")
-+geom_point(aes(y=cumulative_incident_cases),colour="blue")+labs(
+fitted_cumulative_incidence%>%ggplot(aes(x=Date))+geom_line(aes(y=S),color="green")+geom_line(aes(y=R),color="yellow")+geom_line(aes(y=I),color="red")+geom_point(aes(y=cumulative_incident_cases),color="blue")+labs(
   y="Incidencia acumulada",
   subtitle="rojo=prediccion modelo SIR, azul=valores reales"
 )+theme_minimal()
