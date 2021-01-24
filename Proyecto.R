@@ -10,6 +10,7 @@
 library(tidyverse)
 library(lubridate)
 library(deSolve)
+install.packages("plotly")
 #---------------------------------
 #Datos a emplear
 datosp<-read.csv("/home/joshua/UCR/MA0455/Proyecto/datos.csv",sep=";")
@@ -25,7 +26,8 @@ SIR<- function(time,state,parameters){
     list(c(dS,dI,dR))
   })
 }
-Infected <- subset(datosp, FECHA >= datosp$FECHA[1] & FECHA <= datosp$FECHA[323])$Acumulados
+#subset(datosp, FECHA >= datosp$FECHA[1] & FECHA <= datosp$FECHA[323])
+Infected <- datosp$Acumulados[1:(length(datosp$Acumulados)-1)]
 Day<-1:(length(Infected))
 #Datos iniciales
 N<- 5000000
@@ -71,7 +73,7 @@ fitted_cumulative_incidence<-fitted_cumulative_incidence%>%
     
   )
 
-fitted_cumulative_incidence%>%ggplot(aes(x=Date))+geom_line(aes(y=S),color="green")+geom_line(aes(y=R),color="yellow")+geom_line(aes(y=I),color="red")+geom_point(aes(y=cumulative_incident_cases),color="blue")+labs(
+fitted_cumulative_incidence%>%ggplot(aes(x=Date))+geom_line(aes(y=I),color="red")+geom_point(aes(y=cumulative_incident_cases),color="blue")+labs(
   y="Incidencia acumulada",
   subtitle="rojo=prediccion modelo SIR, azul=valores reales"
 )+theme_minimal()
