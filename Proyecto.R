@@ -10,7 +10,7 @@
 library(tidyverse)
 library(lubridate)
 library(deSolve)
-install.packages("plotly")
+library(plotly)
 #---------------------------------
 #Datos a emplear
 datosp<-read.csv("/home/joshua/UCR/MA0455/Proyecto/datos.csv",sep=";")
@@ -42,7 +42,7 @@ init<-c(
 RSS<-function(parameters){
   names(parameters)<-c("beta","gamma")
   out<-ode(y=init,times=Day,func=SIR,parms=parameters)
-  fit<-out[,3]
+  fit<-out[,3] #Infectados calculados por el modelo
   sum((Infected-fit)^2)
 }
 Opt<-optim(c(0.5,0.5),
@@ -51,7 +51,9 @@ Opt<-optim(c(0.5,0.5),
            lower=c(0,0),
            upper=c(1,1)
 )
+Opt
 Opt$message
+#Toma los valores calculados por lo anterior para beta y para gamma
 Opt_par<-setNames(Opt$par,c("beta","gamma"))
 Opt_par
 
@@ -73,7 +75,7 @@ fitted_cumulative_incidence<-fitted_cumulative_incidence%>%
     
   )
 
-fitted_cumulative_incidence%>%ggplot(aes(x=Date))+geom_line(aes(y=I),color="red")+geom_point(aes(y=cumulative_incident_cases),color="blue")+labs(
+ggplotly(fitted_cumulative_incidence%>%ggplot(aes(x=Date))+geom_line(aes(y=I),color="red")+geom_point(aes(y=cumulative_incident_cases),color="blue")+labs(
   y="Incidencia acumulada",
   subtitle="rojo=prediccion modelo SIR, azul=valores reales"
-)+theme_minimal()
+)+theme_minimal())
