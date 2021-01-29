@@ -1,7 +1,7 @@
-#Referencia
+#Autor
 #Martín, B. (2019)
 
-#Autores
+#Modificaciones
 #Joshua Cervantes Artavia
 #Moisés Monges Cordonero
 #Daniel Sabater Guzmán
@@ -27,10 +27,10 @@ SIR<- function(time,state,parameters){
   })
 }
 #subset(datosp, FECHA >= datosp$FECHA[1] & FECHA <= datosp$FECHA[323])
-Infected <- datosp$Acumulados[1:(length(datosp$Acumulados)-1)]
+Infected <- datosp$Acumulados[1:30]
 Day<-1:(length(Infected))
 #Datos iniciales
-N<- 5000000
+N<- 5058007
 init<-c(
   S=N-Infected[1],
   I=Infected[1],
@@ -47,7 +47,8 @@ RSS<-function(parameters){
 }
 Opt<-optim(c(0.5,0.5),
            RSS,
-           method="L-BFGS-B",
+           method="L-BFGS-B", #Se usa este método ya que los demás disponibles
+           #útiles para el problema que estamos resolviendo
            lower=c(0,0),
            upper=c(1,1)
 )
@@ -59,7 +60,7 @@ Opt_par
 
 #Valores predecidos por el modelo
 sir_start_date<-"2020-03-06"
-t<-1:as.integer(ymd("2021-01-24")-ymd("2020-03-06"))
+t<-1:as.integer(ymd("2020-04-10")-ymd("2020-03-06"))#(ymd("2021-01-24")-ymd("2020-03-06"))
 fitted_cumulative_incidence<-data.frame(
   ode(
     y=init,time=t,
@@ -71,11 +72,13 @@ fitted_cumulative_incidence<-fitted_cumulative_incidence%>%
   mutate(
     Date=ymd(sir_start_date)+days(t-1),
     Country="Costa Rica",
-    cumulative_incident_cases=datosp$Acumulados
+    cumulative_incident_cases=datosp$Acumulados[t]
     
   )
 
-ggplotly(fitted_cumulative_incidence%>%ggplot(aes(x=Date))+geom_line(aes(y=I),color="red")+geom_point(aes(y=cumulative_incident_cases),color="blue")+labs(
+ggplotly(fitted_cumulative_incidence%>%ggplot(aes(x=Date))+geom_line(aes(y=I),color="red")+geom_line(aes(y=cumulative_incident_cases),color="blue")+labs(
   y="Incidencia acumulada",
   subtitle="rojo=prediccion modelo SIR, azul=valores reales"
 )+theme_minimal())
+#++geom_line(aes(y=R),color="green")+geom_line(aes(y=S),color="orange")
+
